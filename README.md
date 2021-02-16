@@ -2,18 +2,22 @@
 
 This plugin should only be used on Signal K servers running on Venus OS.
 
-__pdjr-skplugin-sk2venus__ maps compatible Signal K paths into D-Bus
-devices making data updates available in Venus OS.
+__pdjr-skplugin-sk2venus__ creates D-Bus services which derive their data
+values from Signal K.
 
 At the time of writing the plugin supports Venus service classes 'gps',
 'tank' and 'temperature'
 
-The plugin borrows GUI enhancements from Kevin Windrem's
+This project derives from an effort to create tank services in Venus from
+tank data in Signal K as a work-around for Venus' broken support for CAN
+connected multi-channel tank monitoring devices.
+Solving this original problem required some GUI enhancements to allow the
+display of multiple tanks and was achieved by borrowing from Kevin Windrem's
 [tank repeater](https://github.com/kwindrem/SeeLevel-N2K-Victron-VenusOS)
-project to achieve the display shown below, providing a specific fix
-for Venus' multi-channel tank sensor problems.
-
-![CCGX tank display](venus.png)
+project.
+The GUI updates are carried over her, so if you use this project to inject
+tank data into Venus, then you get the bonus of being able to display it
+[quite nicely](venus.png) on the Venus GUI.
 
 ## System requirements
 
@@ -37,6 +41,12 @@ Login to your Signal K dashboard and navigate to
 _Server->Plugin Config_->_Venus tanks_ and select the _Configure_
 to open the configuration panel and reveal the following options.
 
+### Use GUI enhancements?
+
+This boolean property determines whether or not to apply the GUI
+enhancements that support rendering of multiple tanks in the Venus
+GUI.
+If your not bothered about rendering tank data then leave unchecked.
 
 ### D-Bus service definitions
 
@@ -64,7 +74,7 @@ appropriate value for *Signal K path* might be 'tanks.wasteWater.0'.
 This array property consists of a collection of *fiddle factor
 definition* items, each of which defines a multiplication factor that
 should be used on a value returned by Signal K before it is assigned
-to a D-Bus property 
+to a D-Bus property.
 
 ## Suported D-Bus service classes and their properties.
 
