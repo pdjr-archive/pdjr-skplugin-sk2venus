@@ -11,12 +11,13 @@ This project derives from an effort to create tank services in Venus from
 tank data in Signal K as a work-around for Venus' broken support for CAN
 connected multi-channel tank monitoring devices.
 Solving this original problem required some GUI enhancements to allow the
-display of multiple tanks and was achieved by borrowing from Kevin Windrem's
-[tank repeater](https://github.com/kwindrem/SeeLevel-N2K-Victron-VenusOS)
+display of multiple tanks and was achieved by borrowing from Kevin
+Windrem's
+[tank repeater](https://github.com/kwindrem/TankRepeater-for-VenusOs)
 project.
-The GUI updates are carried over here, so if you use this project to inject
-tank data into Venus, then you get the bonus of being able to display it
-[quite nicely](venus.png) on the Venus GUI.
+The GUI updates are carried over here, so if you use this project to
+inject tank data into Venus, then you get the bonus of being able to
+display it [quite nicely](venus.png) on the Venus GUI.
 
 ## System requirements
 
