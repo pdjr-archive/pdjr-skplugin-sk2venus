@@ -1,0 +1,32 @@
+{
+  "name": "pdjr-skplugin-venus-tanks",
+  "version": "1.0.0",
+  "description": "Inject Signal K tank data onto the host dbus",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/preeve9534/pdjr-skplugin-venus-tanks.git"
+  },
+  "keywords": [
+    "signalk-node-server-plugin",
+    "tank",
+    "venus"
+  ],
+  "signalk-plugin-enabled-by-default": true,
+  "author": "Paul Reeve <preeve@pdjr.eu>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/preeve9534/pdjr-skplugin-venus-tanks/issues"
+  },
+  "homepage": "https://github.com/preeve9534/pdjr-skplugin-venus-tanks#readme",
+  "dependencies": {
+    "dbus-native": "^0.4.0",
+    "sprintf-js": "^1.1.2"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "main": "index.js"
+}

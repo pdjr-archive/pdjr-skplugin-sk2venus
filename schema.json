@@ -1,0 +1,35 @@
+{
+    "type": "object",
+    "properties": {
+        "services": {
+            "type": "array",
+            "title": "D-Bus service definitions",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "serviceclass": {
+                        "type": "string",
+			"title": "D-Bus service class",
+                        "enum": [ "gps", "tank", "temperature" ]
+                    },
+                    "path": {
+                        "type": "string",
+			"title": "Signal K path"
+		    },
+                    "factors": {
+			"type": "array",
+			"title": "Property fiddle factors",
+			"items": {
+			    "type": "object",
+			    "properties": {
+			        "name": { "type": "string", "title": "Property name" },
+				"factor": { "type": "number", "title": "Factor", "min": 0, "default": 1.0 }
+			    }
+			}
+		    }
+                },
+            "default": [ ]
+        }
+    }
+}
+
