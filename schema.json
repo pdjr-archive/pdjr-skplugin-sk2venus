@@ -1,6 +1,11 @@
 {
     "type": "object",
     "properties": {
+	"usegui": {
+	    "type": "boolean",
+	    "title": "Use GUI enhancements?",
+	    "default": false
+	},
         "services": {
             "type": "array",
             "title": "D-Bus service definitions",
@@ -32,4 +37,3 @@
         }
     }
 }
-
