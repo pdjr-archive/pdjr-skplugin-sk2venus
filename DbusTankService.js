@@ -33,13 +33,11 @@ module.exports = class DbusTankService extends DbusService {
      * fluidtype and tankinstance, a subsequent call to createService()
      * is required to do that.
      */
-    constructor(tankinstance, fluidtype, factors) {
-        super("com.victronenergy.tank.signalk_" + fluidtype + "_" + tankinstance);
-        this.tankinstance = tankinstance;
+    constructor(name, instance=0, fluidtype=15) {
+        super("com.victronenergy.tank.signalk_" + ((name)?(name):(fluidtype + "_" + instance)));
+        this.instance = instance;
         this.fluidtype = fluidtype;
         this.capacity = 0.0;
-        this.remaining = 0.0;
-        this.factors = factors;
         this.interfaceProperties = [
             { "property": "/Level",     "type": "f", "initial": 0.0, "signalkKey": ".currentLevel", "factor": 100 },
             { "property": "/Capacity",  "type": "f", "initial": 0.0, "signalkKey": ".capacity.value" },
@@ -82,7 +80,7 @@ module.exports = class DbusTankService extends DbusService {
                 super.update(interfaceProperty.property, (value * interfaceProperty.factor));
                 break;
             case "/Capacity":
-                this.capacity = (value * interfaceProperty.factor);
+                this.capacity = value;
                 super.update(interfaceProperty.property, this.capacity);
                 break;
             default:

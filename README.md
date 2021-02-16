@@ -14,7 +14,7 @@ Solving this original problem required some GUI enhancements to allow the
 display of multiple tanks and was achieved by borrowing from Kevin Windrem's
 [tank repeater](https://github.com/kwindrem/SeeLevel-N2K-Victron-VenusOS)
 project.
-The GUI updates are carried over her, so if you use this project to inject
+The GUI updates are carried over here, so if you use this project to inject
 tank data into Venus, then you get the bonus of being able to display it
 [quite nicely](venus.png) on the Venus GUI.
 
@@ -50,13 +50,27 @@ If your not bothered about rendering tank data then leave unchecked.
 ### Service definitions
 
 This array property consists of a collection of *service definition*
-items, each of which defines a single Venus system service.
+items, each of which specifies a single Venus system service.
 Each *service definition* has the following properties:
 
 #### Service class
 
-This string property defines the Venus service class.
+This required string property defines the Venus service class.
 Choose from 'gps', 'tank' or 'temperature' to suit your requirement.
+
+#### Service name
+
+This string property supplies a value that will be used to construct
+the Venus service name.
+A value is required for services in classes 'gps' and 'temperature'
+and optional for service class 'tank'.
+In this latter case if no name value is supplied then one will be
+constructed of the form '*fluidtype*\_*tankinstance*'.
+
+However a value for service name is arrived at, the resulting Venus
+service name will take the form:
+
+'com.victronenergy.*class*.signalk\_*server-ip-address*\_*server-port*\_*name*'
 
 #### Signal K path
 

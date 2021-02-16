@@ -8,14 +8,18 @@
     },
     "services": {
       "type": "array",
-      "title": "D-Bus service definitions",
+      "title": "Service definitions",
       "items": {
         "type": "object",
         "properties": {
           "class": {
             "type": "string",
-            "title": "D-Bus service class",
+            "title": "Service class",
             "enum": [ "gps", "tank", "temperature" ]
+          },
+          "name": {
+            "type": "string",
+            "title": "Service name"
           },
           "path": {
             "type": "string",

@@ -68,20 +68,20 @@ module.exports = function(app) {
                         let dbusService = null;
                         switch (service.class) {
                             case 'gps':
-                                dbusService = new DbusGpsService(service.factor);
+                                dbusService = new DbusGpsService(service.name);
                                 break;
                             case 'tank':
                                 var matches = service.path.match(/^tanks\.(.*)\.(.*)$/);
                                 if (matches) {
                                     var instance = matches[2];
                                     var fluidtype = (SIGNALK_FLUID_TYPES.hasOwnProperty(matches[1]))?SIGNALK_FLUID_TYPES[matches[1]]:SIGNALK_FLUID_TYPES['undefined']; 
-                                    dbusService = new DbusTankService(instance, fluidtype, service.factors);
+                                    dbusService = new DbusTankService(service.name, instance, fluidtype);
                                 } else {
                                     log.E("ignoring %s service with invalid Signal K path (%s)", service.class, service.path);
                                 }
                                 break;
                             case 'temperature':
-                                dbusService = new DbusTemperatureService(service.factor);
+                                dbusService = new DbusTemperatureService(service.name);
                                 break;
                             default:
                                 break;
