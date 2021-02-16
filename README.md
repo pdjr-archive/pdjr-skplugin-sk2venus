@@ -23,6 +23,54 @@ display it [quite nicely](venus.png) on the Venus GUI.
 
 A host system running Signal K under Venus OS.
 
+## Supported service classes
+
+Services created by the plugin are assigned an identifier of the form:\
+
+    com.victronenergy.*class*.signalk\_*name*
+
+where *class* is a supported Venus service class (one of 'gps', 'tanks'
+or 'temperature') and *name* is a user supplied value which serves to
+differentiate service instances within a class.
+In the case of 'tank' class instances you do not have to specify a name
+because the system can automatically construct from the Signal K data
+source.
+
+The following tables summarise the supported service classes and their
+data properties.
+The value *path* in the tables refers to the Signal K path from which
+the service properties will be updated. 
+
+### gps
+
+| Property           | Signal K key          | Comment  |
+|:-------------------|:----------------------|:---------|
+| Fix                | *path*.value          |          |
+| Position/Latitude  | *path*.value          |          |
+| Position/Longitude | *path*.value          |          |
+| MagneticVariation  | *path*.value          |          |
+| Speed              | *path*.value          |          |
+| Course             | *path*.value          |          |
+| Altitude           | *path*.value          |          |
+| NrOfSatellites     | *path*.value          |          |
+| UtcTimestamp       | *path*.value          |          |
+
+### tank
+
+| Property           | Signal K key          | Comment                          |
+|:-------------------|:----------------------|:---------------------------------|
+| Level              | *path*.currentLevel   | Signal K value * 100             |
+| Capacity           | *path*.capacity.value |                                  |
+| Remaining          | n/a                   | Computed from Level and Capacity |
+| FluidType          | n/a                   | Derived from *path*              |
+
+### temperature
+
+| Property           | Signal K key          | Comment                          |
+|:-------------------|:----------------------|:---------------------------------|
+| Temperature        | *path*.value          | Signal K value - 273             |
+
+
 ## Installation
 
 Download and install __pdjr-skplugin-sk2venus__ using the _Appstore_
@@ -62,16 +110,11 @@ Choose from 'gps', 'tank' or 'temperature' to suit your requirement.
 #### Service name
 
 This string property supplies a value that will be used to construct
-the Venus service name.
-A value is required for services in classes 'gps' and 'temperature'
-and optional for service class 'tank'.
-In this latter case if no name value is supplied then one will be
-constructed of the form '*fluidtype*\_*tankinstance*'.
-
-However a value for service name is arrived at, the resulting Venus
-service name will take the form:
-
-'com.victronenergy.*class*.signalk\_*server-ip-address*\_*server-port*\_*name*'
+a unique Venus service name.
+A unique value is required for each configured service in classes
+'gps' and 'temperature'.
+A value can be supplied for services in class 'tank' or the plugin can
+be left to generate its own unique name.
 
 #### Signal K path
 
@@ -83,55 +126,11 @@ choice of *Service class*.
 For example, if you set *Service class* to 'tank', then an appropriate
 value for *Signal K path* might be 'tanks.wasteWater.0'.
 
-#### Property fiddle factors
-
-This array property consists of a collection of *fiddle factor
-definition* items, each of which defines a multiplication factor that
-should be used on a value returned by Signal K before it is assigned
-to a service data property.
-
-## Suported service classes and their properties.
-
-### gps
-
-| Property           | Signal K key          | Default fiddle factor | Comment  |
-|:-------------------|:----------------------|----------------------:|:---------|
-| Fix                | *path*.value          | 1.0                   |          |
-| Position/Latitude  | *path*.value          | 1.0                   |          |
-| Position/Longitude | *path*.value          | 1.0                   |          |
-| MagneticVariation  | *path*.value          | 1.0                   |          |
-| Speed              | *path*.value          | 1.0                   |          |
-| Course             | *path*.value          | 1.0                   |          |
-| Altitude           | *path*.value          | 1.0                   |          |
-| NrOfSatellites     | *path*.value          | 1.0                   |          |
-| UtcTimestamp       | *path*.value          | 1.0                   |          |
-
-### tank
-
-| Property           | Signal K key          | Default fiddle factor | Comment  |
-|:-------------------|:----------------------|----------------------:|:---------|
-| Level              | *path*.currentLevel   | 1.0                   |          |
-| Capacity           | *path*.capacity.value | 1.0                   |          |
-| Remaining          | n/a                   | n/a                   | Computed |
-| FluidType          | n/a                   | n/a                   | Derived from *path* |
-
-### temperature
-
-| Property           | Signal K key          | Default fiddle factor | Comment  |
-|:-------------------|:----------------------|----------------------:|:---------|
-| Temperature        | *path*.value          | 1.0                   |          |
-
-
-
-
-
-## Reviewing operation in Venus OS
-
 ## Acknowledgements
 
-Thanks to @kwindrem for making this a whole lot easier than it might have
-been by designing his repeater software in a way which allows its components
-to be leveraged by others.
+Thanks to @kwindrem for making this a whole lot easier than it might
+have been by designing his repeater software in a way which allows its
+components to be leveraged by others.
 
 ## Author
 
