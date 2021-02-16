@@ -14,7 +14,8 @@
  * permissions and limitations under the License.
  */
 
- dbus = require('dbus-native');
+dbus = require('dbus-native');
+DbusService = require('./DbusService.js');
 
 /**********************************************************************
  * SignalkTankService implements a 'tank' class dbus service which
@@ -33,18 +34,28 @@ module.exports = class DbusTankService extends DbusService {
      * is required to do that.
      */
     constructor(tankinstance, fluidtype, factors) {
-	super("com.victronenergy.tank.signalk_" + fluidtype + "_" + instance);
+        super("com.victronenergy.tank.signalk_" + fluidtype + "_" + tankinstance);
         this.tankinstance = tankinstance;
         this.fluidtype = fluidtype;
+        this.capacity = 0.0;
+        this.remaining = 0.0;
         this.factors = factors;
-        this.tankcapacity = 0.0;
-	this.interfaceProperties = [
-		{ "property": "/Level", "type": "f", "signalkKey": ".currentLevel" },
-		{ "property": "/Capacity", "type": "f", "signalkKey": ".capacity.value" }
-        }
+        this.interfaceProperties = [
+            { "property": "/Level",     "type": "f", "initial": 0.0, "signalkKey": ".currentLevel", "factor": 100 },
+            { "property": "/Capacity",  "type": "f", "initial": 0.0, "signalkKey": ".capacity.value" },
+            { "property": "/Remaining", "type": "f", "initial": 0.0  },
+            { "property": "/FluidType", "type": "i", "initial": this.fluidtype },
+            { "property": "/DeviceInstance", "type": "i", "initial": this.tankinstance }
+        ]
+    }
 
-        getSignalkTriggerKey() { return(this.interfaceProperties[0].signalkKey); }
-        getSignalkStaticKeys() { return(this.interfaceProperties.slice(1).filter(p => (p.hasOwnProperty('signalkKey'))).map(p => p.signalkKey)); }
+    getSignalkTriggerKey() {
+        return(this.interfaceProperties[0].signalkKey);
+    }
+
+    getSignalkStaticKeys() {
+        return(this.interfaceProperties.slice(1).filter(p => (p.hasOwnProperty('signalkKey'))).map(p => p.signalkKey));
+    }
 
     /******************************************************************
      * createService() attempts to asynchronously instantiate and
@@ -53,66 +64,29 @@ module.exports = class DbusTankService extends DbusService {
      * An exception is thrown on error.
      */
     createService() {
-        if (this.bus) {
-            this.bus.requestName(this.servicename, 0x4, function (err, retcode) {
-                if ((err) || (retcode !== 1)) {
-                    throw "service creation failed (" + (err)?err:retcode + ")";
-                } else {
-                    this.ifacedesc = {
-                        name: this.interfacename,
-                        properties: {
-                            '/Mgmt/ProcessName': 's',
-                            '/Mgmt/ProcessVersion': 's',
-                            '/Mgmt/Connection': 's',
-                            '/DeviceInstance': 'i',
-                            '/ProductId': 's',
-                            '/ProductName': 's',
-                            '/FirmwareVersion': 's',
-                            '/HardwareVersion': 's',
-                            '/Connected': 'i',
-                            '/Level': 'i',
-                            '/FluidType': 'i',
-                            '/Capacity': 'f',
-                            '/Remaining': 'f'
-                        }
-                    };
-                    this.iface = {
-                        '/Mgmt/ProcessName': 'Signal K',
-                        '/Mgmt/ProcessVersion': 'Not defined',
-                        '/Mgmt/Connection': 'Signal K plugin',
-                        '/DeviceInstance': this.tankinstance,
-                        '/ProductId': 'venus-tanks',
-                        '/ProductName': 'pdjr-skplugin-venus-tanks',
-                        '/FirmwareVersion': 'n/a',
-                        '/HardwareVersion': 'n/a',
-                        '/Connected': 1,
-                        '/Level': 0,
-                        '/FluidType': this.fluidtype,
-                        '/Capacity': this.tankcapacity,
-                        '/Remaining': 0
-                    };
-                    this.bus.exposeInterface(this.iface, this.objectpath, this.ifacedesc); 
-                }
-            }.bind(this));
-        } else {
-            throw "not connected to system bus";
-        }
+        super.createService(
+            this.interfaceProperties.reduce((a,v) => { a[v.property] = v.type; return(a); }, {}),
+            this.interfaceProperties.reduce((a,v) => { a[v.property] = v.initial; return(a); }, {})
+        );
     }
             
     /******************************************************************
      * update(currentlevel[, capacity]) updates the dbus service for
      * this tank from the supplied data.
      */
-    update(currentlevel, capacity=null) {
-        if ((this.bus) && (this.iface)) {
-            if (capacity) {
-                this.tankcapacity = (capacity * this.factor);
-                this.iface['/Capacity'] = this.tankcapacity;
-            }
-            if (this.tankcapacity) {
-                this.iface['/Remaining'] = (this.tankcapacity * currentlevel);
-            }
-            this.iface['/Level'] = Math.round(currentlevel * 100);
+    update(key, value) {
+        var interfaceProperty = this.interfaceProperties.reduce((a,v) => { if (v.signalkKey == key) { return(v); } else { return(a) }}, null);
+        switch (interfaceProperty.property) {
+            case "/Level":
+                super.update("/Remaining", (this.capacity * value));
+                super.update(interfaceProperty.property, (value * interfaceProperty.factor));
+                break;
+            case "/Capacity":
+                this.capacity = (value * interfaceProperty.factor);
+                super.update(interfaceProperty.property, this.capacity);
+                break;
+            default:
+                break;
         }
     }
 

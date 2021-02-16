@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 const Log = require('./lib/signalk-liblog/Log.js');
-const DbusService = require('./DbusService');
+const DbusTankService = require('./DbusTankService');
 
 const PLUGIN_ID = "pdjr-skplugin-sk2venus";
 
@@ -31,6 +31,10 @@ const SIGNALK_FLUID_TYPES = {
     error: 14,
     unavailable: 15
 };
+
+const VENUS_GUI_FOLDER = "/opt/victronenergy/gui/qml/";
+const MY_GUI_FOLDER = __dirname + "/gui/";
+const GUI_FILES = [ "OverviewMobile.qml", "TileTank.qml" ];
 
 module.exports = function(app) {
     var plugin = {};
@@ -47,56 +51,97 @@ module.exports = function(app) {
     plugin.uischema = (fs.existsSync(__dirname + "/uischema.json"))?JSON.parse(fs.readFileSync(__dirname + "/uischema.json")):{};
 
     plugin.start = function(options) {
-	if ((options) && (options.hasOwnProperty('services')) && (options.service.length > 0)) {
-            log.N("creating %s D-bus services", options.services.length);
-            options.services.forEach(service => {
+        if (options) {
+
+            if (options.usegui) {
                 try {
-		    let dbusService = null;
-		    switch (service.class) {
-		        case 'gps':
-			    dbusService = new DbusGpsService(service.factor);
-			    break;
-		        case 'tank':
-	                    var matches = service.path.matches(/^tanks\.(.*)\.(.*)$/);
-			    if (matches) {
-			        var instance = matches[1];
-				var fluidtype = (SIGNALK_FLUID_TYPES.hasOwnProperty(matches[0]))?SIGNALK_FLUID_TYPES[matches[0]]:SIGNALK_FLUID_TYPES['undefined']; 
-		                dbusService = new DbusTankService(instance, fluidtype, service.factors);
-			    } else {
-			        log.E("ignoring %s service with invalid Signal K path (%s)", service.class, service.path);
-			    }
-			    break;
-			case 'temperature':
-			    dbusService = new DbusTemperatureService(service.factor);
-		            break;
-		        default:
-		            break;
-		    }
-                    dbusService.createService();
-		    var triggerKey = dbusService.getSignalkTriggerKey();
-		    var staticKeys = null;
-		    if (triggerKey) {
-                        var stream = app.streambundle.getSelfStream(service.path + triggerKey());
-                        if (stream) {
-                            unsubscribes.push(stream.onValue(currentLevel => {
-                                if (staticKeys === null) {
-				    staticKeys = dbusService.getSignalkStaticKeys();
-				    staticKeys.forEach(key => dbusService.update(key, app.getSelfPath(service.path + key)));
-				}
-                                dbusService.update(null, currentLevel)
-                            }));
-                        }
-		    }
-                } catch(e)  {
-                    log.E("unable to create %s service for Signal K path %s (%s)", service.class, service.path, e);
+                    configureGUI(options.usegui);
+                } catch(e) {
+                    log.E("error configuring GUI (%s)", e);
                 }
-	    });
+            }
+
+            if ((options.hasOwnProperty('services')) && (options.services.length > 0)) {
+                log.N("creating %s Venus service%s", options.services.length, ((options.services.length == 1)?"":"s"));
+                options.services.forEach(service => {
+                    try {
+                        let dbusService = null;
+                        switch (service.class) {
+                            case 'gps':
+                                dbusService = new DbusGpsService(service.factor);
+                                break;
+                            case 'tank':
+                                var matches = service.path.match(/^tanks\.(.*)\.(.*)$/);
+                                if (matches) {
+                                    var instance = matches[2];
+                                    var fluidtype = (SIGNALK_FLUID_TYPES.hasOwnProperty(matches[1]))?SIGNALK_FLUID_TYPES[matches[1]]:SIGNALK_FLUID_TYPES['undefined']; 
+                                    dbusService = new DbusTankService(instance, fluidtype, service.factors);
+                                } else {
+                                    log.E("ignoring %s service with invalid Signal K path (%s)", service.class, service.path);
+                                }
+                                break;
+                            case 'temperature':
+                                dbusService = new DbusTemperatureService(service.factor);
+                                break;
+                            default:
+                                break;
+                        }
+                        dbusService.createService();
+                        var triggerKey = dbusService.getSignalkTriggerKey();
+                        var staticKeys = null;
+                        if (triggerKey) {
+                            var stream = app.streambundle.getSelfStream(service.path + triggerKey);
+                            if (stream) {
+                                unsubscribes.push(stream.onValue(currentLevel => {
+                                    if (staticKeys === null) {
+                                        staticKeys = dbusService.getSignalkStaticKeys();
+                                        staticKeys.forEach(key => dbusService.update(key, app.getSelfPath(service.path + key)));
+                                    }
+                                    dbusService.update(triggerKey, currentLevel)
+                                }));
+                            }
+                        }
+                    } catch(e)  {
+                        log.E("unable to create %s service for Signal K path %s (%s)", service.class, service.path, e);
+                    }
+                });
+            }
         }
     }
 
     plugin.stop = function() {
         unsubscribes.forEach(f => f())
         unsubscribes = []
+    }
+
+   /******************************************************************
+     * If yesno, then backup the extant system GUI files and copy our
+     * versions of GUI_FILES into VENUS_GUI_FOLDER if they aren't there
+     * already. Otherwise replace them with any previously made
+     * backups.
+     */
+
+    function configureGUI(yesno) {
+        if (fs.existsSync(VENUS_GUI_FOLDER)) {
+            if (yesno) {
+                GUI_FILES.forEach(file => {
+                    if (!fs.existsSync(VENUS_GUI_FOLDER + file + ".orig")) {
+                        if (fs.existsSync(VENUS_GUI_FOLDER + file)) {
+                            fs.renameSync(VENUS_GUI_FOLDER + file, VENUS_GUI_FOLDER + file + ".orig");
+                        }
+                    }
+                    fs.copyFileSync(MY_GUI_FOLDER + file, VENUS_GUI_FOLDER + file);
+                });
+            } else {
+                GUI_FILES.forEach(file => {
+                    if (fs.existsSync(VENUS_GUI_FOLDER + file + ".orig")) {
+                        fs.renameSync(VENUS_GUI_FOLDER + file + ".orig", VENUS_GUI_FOLDER + file);
+                    }
+                });
+            }
+        } else {
+            throw "Venus GUI folder not found - are you running on Venus OS?"
+        }
     }
 
     return(plugin);

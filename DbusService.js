@@ -33,7 +33,7 @@ module.exports = class DbusService {
      * is required to do that.
      */
     constructor(servicename) {
-	this.servicename = servicename;
+	    this.servicename = servicename;
         this.interfacename = this.servicename;
         this.objectpath = this.servicename.replace(/\./g, '/');
         this.bus = dbus.systemBus();
@@ -48,7 +48,7 @@ module.exports = class DbusService {
      * configured in a way which satisfies the requirements of Venus OS.
      * An exception is thrown on error.
      */
-    createService() {
+    createService(ifacedesc, iface) {
         if (this.bus) {
             this.bus.requestName(this.servicename, 0x4, function (err, retcode) {
                 if ((err) || (retcode !== 1)) {
@@ -66,12 +66,9 @@ module.exports = class DbusService {
                             '/FirmwareVersion': 's',
                             '/HardwareVersion': 's',
                             '/Connected': 'i',
-                            '/Level': 'i',
-                            '/FluidType': 'i',
-                            '/Capacity': 'f',
-                            '/Remaining': 'f'
                         }
                     };
+                    if (ifacedesc) this.ifacedesc = Object.assign(this.ifacedesc, ifacedesc);
                     this.iface = {
                         '/Mgmt/ProcessName': 'Signal K',
                         '/Mgmt/ProcessVersion': 'Not defined',
@@ -82,11 +79,8 @@ module.exports = class DbusService {
                         '/FirmwareVersion': 'n/a',
                         '/HardwareVersion': 'n/a',
                         '/Connected': 1,
-                        '/Level': 0,
-                        '/FluidType': this.fluidtype,
-                        '/Capacity': this.tankcapacity,
-                        '/Remaining': 0
                     };
+                    if (iface) this.iface = Object.assign(this.iface, iface);
                     this.bus.exposeInterface(this.iface, this.objectpath, this.ifacedesc); 
                 }
             }.bind(this));
@@ -99,16 +93,9 @@ module.exports = class DbusService {
      * update(currentlevel[, capacity]) updates the dbus service for
      * this tank from the supplied data.
      */
-    update(currentlevel, capacity=null) {
+    update(property, value) {
         if ((this.bus) && (this.iface)) {
-            if (capacity) {
-                this.tankcapacity = (capacity * this.factor);
-                this.iface['/Capacity'] = this.tankcapacity;
-            }
-            if (this.tankcapacity) {
-                this.iface['/Remaining'] = (this.tankcapacity * currentlevel);
-            }
-            this.iface['/Level'] = Math.round(currentlevel * 100);
+            this.iface[property] = value;
         }
     }
 
