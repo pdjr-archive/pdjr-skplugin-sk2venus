@@ -41,6 +41,12 @@ Login to your Signal K dashboard and navigate to
 _Server->Plugin Config_->_Venus tanks_ and select the _Configure_
 to open the configuration panel and reveal the following options.
 
+### Use GUI enhancements?
+
+This boolean property determines whether or not to apply the GUI
+enhancements that support rendering of multiple tanks in the Venus
+GUI.
+If your not bothered about rendering tank data then leave unchecked.
 
 ### D-Bus service definitions
 
@@ -68,7 +74,7 @@ appropriate value for *Signal K path* might be 'tanks.wasteWater.0'.
 This array property consists of a collection of *fiddle factor
 definition* items, each of which defines a multiplication factor that
 should be used on a value returned by Signal K before it is assigned
-to a D-Bus property 
+to a D-Bus property.
 
 ## Suported D-Bus service classes and their properties.
 
