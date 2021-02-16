@@ -2,18 +2,22 @@
 
 This plugin should only be used on Signal K servers running on Venus OS.
 
-__pdjr-skplugin-sk2venus__ maps compatible Signal K paths into D-Bus
-devices making data updates available in Venus OS.
+__pdjr-skplugin-sk2venus__ creates D-Bus services which derive their data
+properties from Signal K.
 
 At the time of writing the plugin supports Venus service classes 'gps',
 'tank' and 'temperature'
 
-The plugin borrows GUI enhancements from Kevin Windrem's
+This project derives from an effort to create tank services in Venus from
+tank data in Signal K as a work-around for Venus' broken support for CAN
+connected multi-channel tank monitoring devices.
+Solving this original problem required some GUI enhancements to allow the
+display of multiple tanks and was achieved by borrowing from Kevin Windrem's
 [tank repeater](https://github.com/kwindrem/SeeLevel-N2K-Victron-VenusOS)
-project to achieve the display shown below, providing a specific fix
-for Venus' multi-channel tank sensor problems.
-
-![CCGX tank display](venus.png)
+project.
+The GUI updates are carried over her, so if you use this project to inject
+tank data into Venus, then you get the bonus of being able to display it
+[quite nicely](venus.png) on the Venus GUI.
 
 ## System requirements
 
