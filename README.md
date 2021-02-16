@@ -3,7 +3,7 @@
 This plugin should only be used on Signal K servers running on Venus OS.
 
 __pdjr-skplugin-sk2venus__ creates D-Bus services which derive their data
-properties from Signal K.
+values from Signal K.
 
 At the time of writing the plugin supports Venus service classes 'gps',
 'tank' and 'temperature'
