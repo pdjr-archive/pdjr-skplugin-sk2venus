@@ -43,16 +43,6 @@ of the form: 'com.victronenergy.*class*.signalk\_*name*'.
 The following discussion gives an overwiew of the characteristics of
 each type of service supported by the plugin and illustrates how an
 instance of each service might be defined.
-====
- tables summarise the way each of the supported service
-classes is defined in Venus, gives an example of how such a service
-instance might be defined in the plugin and discusses some gotchas
-which emerge from differences in the data schemes adopted by
-Venus and Signal K.
-
-The value *path* in the tables refers to the Signal K path from which
-the service properties will be updated. 
-====
 
 ### temperature
 
