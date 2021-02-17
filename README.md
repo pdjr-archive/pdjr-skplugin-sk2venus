@@ -23,53 +23,125 @@ display it [quite nicely](venus.png) on the Venus GUI.
 
 A host system running Signal K under Venus OS.
 
-## Supported service classes
+## Operating principle
 
-Services created by the plugin are assigned an identifier of the form:\
+__pdjr-skplugin-sk2venus__ processes a collection of *service definitions*
+into an equivalent collection of Venus services.
 
-    com.victronenergy.*class*.signalk\_*name*
+Each service definition supplies a Venus service *class* name (one of
+'tank', 'temperature' or 'gps') and a *path* which specifies the
+primary Signal K data value that contributes to service updates.
 
-where *class* is a supported Venus service class (one of 'gps', 'tanks'
-or 'temperature') and *name* is a user supplied value which serves to
-differentiate service instances within a class.
-In the case of 'tank' class instances you do not have to specify a name
-because the system can automatically construct from the Signal K data
-source.
+In most situations a service definition must also supply a *name* that
+uniquely identifies a service within its class (in the case of 'tank'
+services a meaningful unique serviceid can be automatically constructed
+by the plugin). 
 
-The following tables summarise the supported service classes and their
-data properties.
+Services created by the plugin are assigned a Venus service name
+of the form: 'com.victronenergy.*class*.signalk\_*name*'.
+ 
+The following discussion gives an overwiew of the characteristics of
+each type of service supported by the plugin and illustrates how an
+instance of each service might be defined.
+====
+ tables summarise the way each of the supported service
+classes is defined in Venus, gives an example of how such a service
+instance might be defined in the plugin and discusses some gotchas
+which emerge from differences in the data schemes adopted by
+Venus and Signal K.
+
 The value *path* in the tables refers to the Signal K path from which
 the service properties will be updated. 
-
-### gps
-
-| Property           | Signal K key          | Comment  |
-|:-------------------|:----------------------|:---------|
-| Fix                | *path*.value          |          |
-| Position/Latitude  | *path*.value          |          |
-| Position/Longitude | *path*.value          |          |
-| MagneticVariation  | *path*.value          |          |
-| Speed              | *path*.value          |          |
-| Course             | *path*.value          |          |
-| Altitude           | *path*.value          |          |
-| NrOfSatellites     | *path*.value          |          |
-| UtcTimestamp       | *path*.value          |          |
-
-### tank
-
-| Property           | Signal K key          | Comment                          |
-|:-------------------|:----------------------|:---------------------------------|
-| Level              | *path*.currentLevel   | Signal K value * 100             |
-| Capacity           | *path*.capacity.value |                                  |
-| Remaining          | n/a                   | Computed from Level and Capacity |
-| FluidType          | n/a                   | Derived from *path*              |
+====
 
 ### temperature
 
-| Property           | Signal K key          | Comment                          |
+| Service property   | Signal K key          | Comment                          |
 |:-------------------|:----------------------|:---------------------------------|
 | Temperature        | *path*.value          | Signal K value - 273             |
 
+Temperature values are widely distributed in Signal K with no group
+structuring principle.
+This means that you *must* supply a unique name for every temperature
+service you create.
+For example:
+
+| Item               | Value                                                    |
+|:-------------------|:---------------------------------------------------------|
+| *class*            | 'temperature'                                            |
+| *name*             | 'seawater'                                               |
+| *path*             | 'environment.water.temperature'                          |
+| service name       | 'com.victronenergy.temperature.signalk\_seawater'        |
+
+### tank
+
+| Service property   | Signal K key          | Comment                          |
+|:-------------------|:----------------------|:---------------------------------|
+| Level              | *path*.currentLevel   | Signal K value * 100             |
+| Capacity           | *path*.capacity.value | Signal K value                   |
+| Remaining          | n/a                   | Computed from Level and Capacity |
+| FluidType          | n/a                   | Decoded from *path*              |
+
+Tank data in Signal K is structured under a path which encodes both
+fluid type and instance numberi.
+This structuring principle made some assumptions about data originating
+from N2K, but in this instance its useful to us and allows a value for
+*name* to be generated automatically as '*fluidtype*:*instance*'.
+For example.
+
+| Item               | Value                                                    |
+|:-------------------|:---------------------------------------------------------|
+| *class*            | 'temperature'                                            |
+| *path*             | 'tanks.wasteWater.0'                                     |
+| service name       | 'com.victronenergy.tanks.signalk\_5\_0'                  |
+
+### gps
+
+| Service property   | Signal K key           | Comment                         |
+|:-------------------|:-----------------------|:--------------------------------|
+| Fix                | *path*.value           |                                 |
+| Position/Latitude  | *path*.latitude.value  | Signal K value                  |
+| Position/Longitude | *path*.longitude.value | Signal K value                  |
+| MagneticVariation  | *path*.value           |                                 |
+| Speed              | *path*.value           |                                 |
+| Course             | *path*.value           |                                 |
+| Altitude           | *path*.value           |                                 |
+| NrOfSatellites     | *path*.value           |                                 |
+| UtcTimestamp       | *path*.value           |                                 |
+
+GPS data in Signal K is handled very differently to in Venus.
+In fact, position data in Signal K need not necessarily derive from
+GPS although it probably always does.
+Signal K also consolidates position data available from multiples
+sources and disaggregates the properties shown in the above table
+across multiple data paths.
+Consolidation strategies are configuration dependent and a number
+are implemented or planned.
+
+The following example uses consolidated position data to create a
+Venus service.
+
+| Item               | Value                                                    |
+|:-------------------|:---------------------------------------------------------|
+| *class*            | 'gps'                                                    |
+| *name*             | 'consolidated'                                           |
+| *path*             | 'navigation.position'                                    |
+| service name       | 'com.victronenergy.gps.signalk\_consolidated'            |
+
+Whilst this example uses an explicit position source.
+
+| Item               | Value                                                    |
+|:-------------------|:---------------------------------------------------------|
+| *class*            | 'gps'                                                    |
+| *name*             | 'simrad'                                                 |
+| *path*             | 'navigation.position.values.'                     |
+| service name       | 'com.victronenergy.gps.signalk\_simrad'                  |
+
+The plugin tries to recover as many properties deriving from the
+position source identified by *path* as it can.
+Coverage varies dependent upon device and other factors, but a proper
+configuration will always set Position/Latitude and Position/Longitude
+properties.
 
 ## Installation
 
