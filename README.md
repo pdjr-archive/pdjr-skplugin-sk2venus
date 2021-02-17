@@ -154,7 +154,7 @@ to open the configuration panel and reveal the following options.
 
 <table>
   <tr>
-    <td colspan=2>Use GUI enhancements?</td>
+    <td colspan=2>Use&nbsp;GUI&nbsp;enhancements?</td>
     <td>
       This boolean property determines whether or not to apply the
       GUI enhancements that support rendering of multiple tanks in
@@ -164,7 +164,7 @@ to open the configuration panel and reveal the following options.
     </td>
   </tr>
   <tr>
-    <td colspan=2>Service definitions</td>
+    <td colspan=2>Service&nbsp;definitions</td>
     <td>
       This array property consists of a collection of *service
       definition* items, each of which specifies a single Venus
@@ -174,7 +174,7 @@ to open the configuration panel and reveal the following options.
   </tr>
   <tr>
     <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>Service class</td>
+    <td>Service&nbsp;class</td>
     <td>
       This required string property defines the Venus service class.
       Choose from 'gps', 'tank' or 'temperature' to suit your requirement.
@@ -182,7 +182,7 @@ to open the configuration panel and reveal the following options.
   </tr>
   <tr>
     <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>Service name</td>
+    <td>Service&nbsp;name</td>
     <td>
       This string property supplies a value that will be used to construct
       a unique Venus service name.
@@ -194,7 +194,7 @@ to open the configuration panel and reveal the following options.
   </tr>
   <tr>
     <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>Signal K path</td>
+    <td>Signal&nbsp;K&nbsp;path</td>
     <td>
       This string property defines the Signal K data path which forms the
       basis of this service and must point to an entry in the Signal K
