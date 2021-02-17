@@ -90,15 +90,15 @@ For example.
 
 | Service property   | Signal K key           | Comment                         |
 |:-------------------|:-----------------------|:--------------------------------|
-| Fix                | *path*.value           |                                 |
-| Position/Latitude  | *path*.latitude.value  | Signal K value                  |
-| Position/Longitude | *path*.longitude.value | Signal K value                  |
-| MagneticVariation  | *path*.value           |                                 |
-| Speed              | *path*.value           |                                 |
-| Course             | *path*.value           |                                 |
-| Altitude           | *path*.value           |                                 |
-| NrOfSatellites     | *path*.value           |                                 |
-| UtcTimestamp       | *path*.value           |                                 |
+| Fix                |                        |                                 |
+| Position/Latitude  | *path*.value.latitude  | Signal K value                  |
+| Position/Longitude | *path*.value.longitude | Signal K value                  |
+| MagneticVariation  |                        |                                 |
+| Speed              |                        |                                 |
+| Course             |                        |                                 |
+| Altitude           |                        |                                 |
+| NrOfSatellites     |                        |                                 |
+| UtcTimestamp       |                        |                                 |
 
 GPS data in Signal K is handled very differently to in Venus.
 In fact, position data in Signal K need not necessarily derive from
@@ -125,7 +125,7 @@ Whilst this example uses an explicit position source.
 |:-------------------|:---------------------------------------------------------|
 | *class*            | 'gps'                                                    |
 | *name*             | 'simrad'                                                 |
-| *path*             | 'navigation.position.values.Actisense2\\.16'                     |
+| *path*             | 'navigation.position.values.Actisense2\\.16'             |
 | service name       | 'com.victronenergy.gps.signalk\_simrad'                  |
 
 The plugin tries to recover as many properties deriving from the
@@ -152,42 +152,60 @@ Login to your Signal K dashboard and navigate to
 _Server->Plugin Config_->_Venus tanks_ and select the _Configure_
 to open the configuration panel and reveal the following options.
 
-### Use GUI enhancements?
+<table>
+  <tr>
+    <td colspan=2>Use GUI enhancements?</td>
+    <td>
+      This boolean property determines whether or not to apply the
+      GUI enhancements that support rendering of multiple tanks in
+      the Venus GUI.
+      If you're not bothered about rendering tank data then leave
+      unchecked.
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2>Service definitions</td>
+    <td>
+      This array property consists of a collection of *service
+      definition* items, each of which specifies a single Venus
+      system service.
+      Each *service definition* has the following properties:
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>Service class</td>
+    <td>
+      This required string property defines the Venus service class.
+      Choose from 'gps', 'tank' or 'temperature' to suit your requirement.
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>Service name</td>
+    <td>
+      This string property supplies a value that will be used to construct
+      a unique Venus service name.
+      A unique value is required for each configured service in classes
+      'gps' and 'temperature'.
+      A value can be supplied for services in class 'tank' or the plugin can
+      be left to generate its own unique name.
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>Signal K path</td>
+    <td>
+      This string property defines the Signal K data path which forms the
+      basis of this service and must point to an entry in the Signal K
+      'self' model that returns a primary value of the type implied by your
+      choice of *Service class*.
 
-This boolean property determines whether or not to apply the GUI
-enhancements that support rendering of multiple tanks in the Venus
-GUI.
-If your not bothered about rendering tank data then leave unchecked.
-
-### Service definitions
-
-This array property consists of a collection of *service definition*
-items, each of which specifies a single Venus system service.
-Each *service definition* has the following properties:
-
-#### Service class
-
-This required string property defines the Venus service class.
-Choose from 'gps', 'tank' or 'temperature' to suit your requirement.
-
-#### Service name
-
-This string property supplies a value that will be used to construct
-a unique Venus service name.
-A unique value is required for each configured service in classes
-'gps' and 'temperature'.
-A value can be supplied for services in class 'tank' or the plugin can
-be left to generate its own unique name.
-
-#### Signal K path
-
-This string property defines the Signal K data path which forms the
-basis of this service and must point to an entry in the Signal K
-'self' model that returns a primary value of the type implied by your
-choice of *Service class*.
-
-For example, if you set *Service class* to 'tank', then an appropriate
-value for *Signal K path* might be 'tanks.wasteWater.0'.
+      For example, if you set *Service class* to 'tank', then an appropriate
+      value for *Signal K path* might be 'tanks.wasteWater.0'.
+    </td>
+  </tr>
+</table>
 
 ## Acknowledgements
 
