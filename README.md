@@ -125,7 +125,7 @@ Whilst this example uses an explicit position source.
 |:-------------------|:---------------------------------------------------------|
 | *class*            | 'gps'                                                    |
 | *name*             | 'simrad'                                                 |
-| *path*             | 'navigation.position.values.'                     |
+| *path*             | 'navigation.position.values.Actisense2\\.16'                     |
 | service name       | 'com.victronenergy.gps.signalk\_simrad'                  |
 
 The plugin tries to recover as many properties deriving from the
