@@ -1,8 +1,8 @@
 # pdjr-skplugin-sk2venus
 
-This plugin should only be used on Signal K servers running on Venus OS.
+__pdjr-skplugin-sk2venus__ makes Signal K data available in Venus OS.
 
-__pdjr-skplugin-sk2venus__ makes Signal K data available in Venus.
+This plugin should only be used on Signal K servers running on Venus OS.
 
 At the time of writing the plugin supports Venus service classes 'gps',
 'tank' and 'temperature'
