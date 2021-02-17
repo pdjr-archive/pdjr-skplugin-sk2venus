@@ -200,7 +200,7 @@ to open the configuration panel and reveal the following options.
       basis of this service and must point to an entry in the Signal K
       'self' model that returns a primary value of the type implied by your
       choice of *Service class*.
-
+      <p>
       For example, if you set *Service class* to 'tank', then an appropriate
       value for *Signal K path* might be 'tanks.wasteWater.0'.
     </td>
