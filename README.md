@@ -44,7 +44,7 @@ The following discussion gives an overwiew of the characteristics of
 each type of service supported by the plugin and illustrates how an
 instance of each service might be defined.
 
-### temperature
+### temperature services
 
 | Service property   | Signal K key          | Comment                          |
 |:-------------------|:----------------------|:---------------------------------|
@@ -63,7 +63,7 @@ For example:
 | *path*             | 'environment.water.temperature'                          |
 | service name       | 'com.victronenergy.temperature.signalk\_seawater'        |
 
-### tank
+### tank services
 
 | Service property   | Signal K key          | Comment                          |
 |:-------------------|:----------------------|:---------------------------------|
@@ -85,7 +85,7 @@ For example.
 | *path*             | 'tanks.wasteWater.0'                                     |
 | service name       | 'com.victronenergy.tanks.signalk\_5\_0'                  |
 
-### gps
+### gps services
 
 | Service property   | Signal K key           | Comment                         |
 |:-------------------|:-----------------------|:--------------------------------|
