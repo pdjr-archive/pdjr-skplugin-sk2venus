@@ -73,10 +73,11 @@ For example:
 | FluidType          | n/a                   | Decoded from *path*              |
 
 Tank data in Signal K is structured under a path which encodes both
-fluid type and instance numberi.
+fluid type and instance number.
 This structuring principle made some assumptions about data originating
-from N2K, but in this instance its useful to us and allows a value for
-*name* to be generated automatically as '*fluidtype*:*instance*'.
+from N2K, but in this instance (excuse the pun) it's useful to us and
+allows a value for *name* to be generated automatically as
+'*fluidtype*:*instance*'.
 For example.
 
 | Item               | Value                                                    |
