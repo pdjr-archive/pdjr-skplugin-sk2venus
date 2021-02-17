@@ -1,11 +1,9 @@
 # pdjr-skplugin-sk2venus
 
-__pdjr-skplugin-sk2venus__ makes Signal K data available in Venus OS.
+__pdjr-skplugin-sk2venus__ makes data from a Signal K server running
+under Venus OS available in Venus services.
 
-This plugin should only be used on Signal K servers running on Venus OS.
-
-At the time of writing the plugin supports Venus service classes 'gps',
-'tank' and 'temperature'
+The plugin supports Venus service classes 'gps', 'tank' and 'temperature'.
 
 This project derives from an effort to create tank services in Venus from
 tank data in Signal K as a work-around for Venus' broken support for CAN
