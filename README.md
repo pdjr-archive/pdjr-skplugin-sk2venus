@@ -130,9 +130,9 @@ Whilst this example uses an explicit position source.
 
 The plugin tries to recover as many properties deriving from the
 position source identified by *path* as it can.
-Coverage varies dependent upon device and other factors, but a proper
-configuration will always set Position/Latitude and Position/Longitude
-properties.
+Coverage varies dependent upon device capability and other factors, but
+a proper configuration will always set the Position/Latitude and
+Position/Longitude properties.
 
 ## Installation
 
