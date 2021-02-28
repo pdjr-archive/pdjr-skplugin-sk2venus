@@ -14,7 +14,9 @@
  * permissions and limitations under the License.
  */
 
- dbus = require('dbus-native');
+dbus = require('dbus');
+
+let ServiceInterface = require('./ServiceInterface.js');
 
 /**********************************************************************
  * SignalkTankService implements a 'tank' class dbus service which
@@ -22,6 +24,28 @@
  * write tank data onto the bus in a format that can be used by the
  * CCGX display and other Venus OS GUIs.
  */
+
+function createGetter(getterImpl) {
+  return async (done) => {
+    await executeMethod(done, getterImpl);
+  };
+}
+
+function createSetter(setterImpl) {
+  return async (value, done) => {
+    await executeMethod(done, setterImpl, value);
+  };
+}
+
+function createProperty(iface, name, type, value, getter, setter) {
+  iface.addProperty(name, {
+    type: dbus.Define(type),
+    getter: getter ? createGetter(getter) : undefined,
+    setter: setter ? createSetter(setter) : undefined,
+  });
+  return(value);
+}
+
 module.exports = class DbusService {
 
     /******************************************************************
@@ -32,71 +56,57 @@ module.exports = class DbusService {
      * fluidtype and tankinstance, a subsequent call to createService()
      * is required to do that.
      */
-    constructor(servicename) {
-	    this.servicename = servicename;
-        this.interfacename = this.servicename;
-        this.objectpath = this.servicename.replace(/\./g, '/');
-        this.bus = dbus.systemBus();
-        this.ifacedesc = null;
-        this.iface = null;
-        if (!this.bus) throw "error connecting to system bus";
-    }
+  constructor(servicename) {
+	  console.log("DbusService(%s,%o)...", servicename, properties);
+	  this.servicename = servicename;
+    this.properties = properties;
+    this.objectname = "/" + this.servicename.replace(/\./g, '/');
+    this.interfacename = this.servicename;
+    this.properties = {};
 
-    /******************************************************************
-     * createService() attempts to asynchronously instantiate and
-     * initialise a dbus service for this tank. The service is
-     * configured in a way which satisfies the requirements of Venus OS.
-     * An exception is thrown on error.
-     */
-    createService(ifacedesc, iface) {
-        if (this.bus) {
-            this.bus.requestName(this.servicename, 0x4, function (err, retcode) {
-                if ((err) || (retcode !== 1)) {
-                    throw "service creation failed (" + (err)?err:retcode + ")";
-                } else {
-                    this.ifacedesc = {
-                        name: this.interfacename,
-                        properties: {
-                            '/Mgmt/ProcessName': 's',
-                            '/Mgmt/ProcessVersion': 's',
-                            '/Mgmt/Connection': 's',
-                            '/DeviceInstance': 'i',
-                            '/ProductId': 's',
-                            '/ProductName': 's',
-                            '/FirmwareVersion': 's',
-                            '/HardwareVersion': 's',
-                            '/Connected': 'i',
-                        }
-                    };
-                    if (ifacedesc) this.ifacedesc = Object.assign(this.ifacedesc, ifacedesc);
-                    this.iface = {
-                        '/Mgmt/ProcessName': 'Signal K',
-                        '/Mgmt/ProcessVersion': 'Not defined',
-                        '/Mgmt/Connection': 'Signal K plugin',
-                        '/DeviceInstance': this.tankinstance,
-                        '/ProductId': 'venus-tanks',
-                        '/ProductName': 'pdjr-skplugin-venus-tanks',
-                        '/FirmwareVersion': 'n/a',
-                        '/HardwareVersion': 'n/a',
-                        '/Connected': 1,
-                    };
-                    if (iface) this.iface = Object.assign(this.iface, iface);
-                    this.bus.exposeInterface(this.iface, this.objectpath, this.ifacedesc); 
-                }
-            }.bind(this));
+	  process.env.DISPLAY = ':0';
+    process.env.DBUS_SESSION_BUS_ADDRESS = 'unix:path=/run/dbus/system_bus_socket';
+  
+    if (this.service = dbus.registerService('system', this.servicename)) {
+		  if (this.object = this.service.createObject(this.objectname)) {
+        if (this.interface = this.object.createInterface(this.interfacename)) {
+          console.log("created new service %s", this.servicename);
         } else {
-            throw "not connected to system bus";
+          throw "error creating interface";
         }
+      } else {
+			  throw "error creating service object";
+		  }
+	  } else {
+		  throw "error connecting to system bus";
+	  }
+  }
+
+  async initialise(klass, instance, properties) {
+    this.properties['/'] = createProperty(this.interface, "/", 'v', {}, this.getPropertyTree.bind(this));
+    this.properties['/DeviceInstance'] = createProperty(this.interface, '/DeviceInstance', this.getDeviceInstance(klass, instance), this.getPropertyValue.bind(this));
+    properties.forEach(p => {
+      this.properties[p.name] = createProperty(this.interface, p.name, p.type, p.value, this.getPropertyValue.bind(this));
+    });
+    this.interface.update();
+  }
+
+  getPropertyTree() {
+    var retval = {};
+  }
+
+  getDeviceInstance(klass, instance) {
+  }
+
+  getPropertyValue(path) {
+    return(this.properties[path]);
+  }
+
+  update(key, value) {
+    if (this.properties.hasOwnPropery(key)) {
+      this.properties[key] = value;
     }
-            
-    /******************************************************************
-     * update(currentlevel[, capacity]) updates the dbus service for
-     * this tank from the supplied data.
-     */
-    update(property, value) {
-        if ((this.bus) && (this.iface)) {
-            this.iface[property] = value;
-        }
-    }
+    this.interface.update();
+  }
 
 }

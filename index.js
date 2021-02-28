@@ -35,6 +35,8 @@ const SIGNALK_FLUID_TYPES = {
 const VENUS_GUI_FOLDER = "/opt/victronenergy/gui/qml/";
 const MY_GUI_FOLDER = __dirname + "/gui/";
 const GUI_FILES = [ "OverviewMobile.qml", "TileTank.qml" ];
+const PLUGIN_SCHEMA_FILE = __dirname + "/schema.json";
+const PLUGIN_UISCHEMA_FILE = __dirname + "/uischema.json";
 
 module.exports = function(app) {
     var plugin = {};
@@ -43,14 +45,18 @@ module.exports = function(app) {
     plugin.id = PLUGIN_ID;
     plugin.name = "Signal K to Venus";
     plugin.description = "Inject Signal K data onto host dbus";
+    plugin.schema = (fs.existsSync(PLUGIN_SCHEMA_FILE))?JSON.parse(fs.readFileSync(PLUGIN_SCHEMA_FILE)):{};
+    plugin.uischema = (fs.existsSync(PLUGIN_UISCHEMA_FILE))?JSON.parse(fs.readFileSync(PLUGIN_UISCHEMA_FILE)):{};
 
     const log = new Log(plugin.id, { ncallback: app.setPluginStatus, ecallback: app.setPluginError });
 
-    plugin.schema = (fs.existsSync(__dirname + "/schema.json"))?JSON.parse(fs.readFileSync(__dirname + "/schema.json")):{};
-
-    plugin.uischema = (fs.existsSync(__dirname + "/uischema.json"))?JSON.parse(fs.readFileSync(__dirname + "/uischema.json")):{};
 
     plugin.start = function(options) {
+
+        process.env.DISPLAY = ':0';
+        process.env.DBUS_SESSION_BUS_ADDRESS = 'unix:path=/run/dbus/system_bus_socket';
+
+
         if (options) {
 
             if (options.usegui) {
@@ -86,7 +92,7 @@ module.exports = function(app) {
                             default:
                                 break;
                         }
-                        dbusService.createService();
+			dbusService.createService();
                         var triggerKey = dbusService.getSignalkTriggerKey();
                         var staticKeys = null;
                         if (triggerKey) {
@@ -97,7 +103,7 @@ module.exports = function(app) {
                                         staticKeys = dbusService.getSignalkStaticKeys();
                                         staticKeys.forEach(key => dbusService.update(key, app.getSelfPath(service.path + key)));
                                     }
-                                    dbusService.update(triggerKey, currentLevel)
+                                    //dbusService.update(triggerKey, currentLevel)
                                 }));
                             }
                         }

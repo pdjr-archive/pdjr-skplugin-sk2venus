@@ -14,7 +14,6 @@
  * permissions and limitations under the License.
  */
 
-dbus = require('dbus-native');
 DbusService = require('./DbusService.js');
 
 /**********************************************************************
@@ -23,37 +22,46 @@ DbusService = require('./DbusService.js');
  * write tank data onto the bus in a format that can be used by the
  * CCGX display and other Venus OS GUIs.
  */
+
+DEFAULT_PROPERTIES = [
+  { name: "/Management/ProcessName", type: "s", value: "pdjr-signalk-sk2venus" },
+  { name: "/Management/ProcessVersion", type: "s", value: "0.1" },
+  { name: "/Management/Connection", type: "s", value: "Signal K" },
+  { name: "ProductId", type: "s", value: "n/a" },
+  { name: "ProductName", type: "s", value: "n/a" },
+  { name: "FirmwareVersion", type: "s", value: "n/a" },
+  { name: "HardwareVersion", type: "s", value: "n/a" },
+  { name: "Connected", type: "i", value: 1 },
+  { name: "Level", type: "f", value: 0.0 },
+  { name: "Capacity", type: "f", value: 0.0 },
+  { name: "FluidType", type: "i", value: 0 },
+  { name: "Remaining", type: "f", value: 0.0 }
+];
+
 module.exports = class DbusTankService extends DbusService {
 
-    /******************************************************************
-     * Construct a new SignalkTankService instance and attempt to
-     * connect to the host system dbus, throwing an exception if the
-     * connection fails. Note that this constructor does not create an
-     * actual dbus service for the Signal K tank identified by
-     * fluidtype and tankinstance, a subsequent call to createService()
-     * is required to do that.
-     */
-    constructor(name, instance=0, fluidtype=15) {
-        super("com.victronenergy.tank.signalk_" + ((name)?(name):(fluidtype + "_" + instance)));
-        this.instance = instance;
-        this.fluidtype = fluidtype;
-        this.capacity = 0.0;
-        this.interfaceProperties = [
-            { "property": "/Level",     "type": "f", "initial": 0.0, "signalkKey": ".currentLevel", "factor": 100 },
-            { "property": "/Capacity",  "type": "f", "initial": 0.0, "signalkKey": ".capacity.value" },
-            { "property": "/Remaining", "type": "f", "initial": 0.0  },
-            { "property": "/FluidType", "type": "i", "initial": this.fluidtype },
-            { "property": "/DeviceInstance", "type": "i", "initial": this.tankinstance }
-        ]
-    }
+  /******************************************************************
+   * Construct a new SignalkTankService instance and attempt to
+   * connect to the host system dbus, throwing an exception if the
+   * connection fails. Note that this constructor does not create an
+   * actual dbus service for the Signal K tank identified by
+   * fluidtype and tankinstance, a subsequent call to createService()
+   * is required to do that.
+   */
+  constructor(name, instance=0, fluidtype=15) {
+    console.log("DbusTankService(%s,%d,%d)...", name, instance, fluidtype);
+    super("com.victronenergy.tank.signalk_" + ((name)?(name):(fluidtype + "_" + instance)));
+    this.instance = instance;
+    this.fluidtype = fluidtype;
+  }
 
-    getSignalkTriggerKey() {
-        return(this.interfaceProperties[0].signalkKey);
-    }
+  getSignalkTriggerKey() {
+    return(this.interfaceProperties[0].signalkKey);
+  }
 
-    getSignalkStaticKeys() {
-        return(this.interfaceProperties.slice(1).filter(p => (p.hasOwnProperty('signalkKey'))).map(p => p.signalkKey));
-    }
+  getSignalkStaticKeys() {
+    return(this.interfaceProperties.slice(1).filter(p => (p.hasOwnProperty('signalkKey'))).map(p => p.signalkKey));
+  }
 
     /******************************************************************
      * createService() attempts to asynchronously instantiate and
@@ -61,11 +69,9 @@ module.exports = class DbusTankService extends DbusService {
      * configured in a way which satisfies the requirements of Venus OS.
      * An exception is thrown on error.
      */
-    createService() {
-        super.createService(
-            this.interfaceProperties.reduce((a,v) => { a[v.property] = v.type; return(a); }, {}),
-            this.interfaceProperties.reduce((a,v) => { a[v.property] = v.initial; return(a); }, {})
-        );
+    initialise() {
+      super.initialise("tank", this.instance, DEFAULT_PROPERTIES);
+      this.update("/FluidType", this.fluidtype);
     }
             
     /******************************************************************

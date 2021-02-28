@@ -22,11 +22,18 @@
   },
   "homepage": "https://github.com/preeve9534/pdjr-skplugin-sk2venus#readme",
   "dependencies": {
+    "dbus": "^1.0.7",
     "dbus-native": "^0.4.0",
+    "dbus-next": "^0.9.1",
+    "node-gyp": "^7.1.2",
     "sprintf-js": "^1.1.2"
   },
   "directories": {
     "lib": "lib"
   },
-  "main": "index.js"
+  "main": "index.js",
+  "devDependencies": {
+    "@babel/core": "^7.12.17",
+    "@babel/plugin-proposal-decorators": "^7.12.13"
+  }
 }

@@ -21,12 +21,13 @@ module.exports = class DbusTemperatureService extends DbusService {
 
     constructor(name, instance=0) {
         if (name) {
-            super("com.victronenergy.temperature.signalk_" + name);
-            this.instance = instance;
-            this.interfaceProperties = [
-                { "property": "/Temperature",     "type": "f", "initial": 0.0, "signalkKey": ".value" },
-                { "property": "/DeviceInstance", "type": "i", "initial": this.instance }
-            ]
+            super(
+	        "com.victronenergy.temperature.signalk_" + name);
+                [
+                    { "property": "Temperature",    "type": "f", "initial": 0.0, "signalkKey": ".value" },
+                    { "property": "DeviceInstance", "type": "i", "initial": this.instance }
+                ]
+            );
         } else {
             throw "service name must be specified";
         } 
