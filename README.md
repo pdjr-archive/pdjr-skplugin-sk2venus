@@ -6,10 +6,10 @@ The plugin supports Venus service classes 'gps', 'tank' and 'temperature'.
 
 ## System requirements
 
-A host system running
-Signal K
+A Venushost system running
+[Signal K](https://github.com/SignalK/signalk-server/blob/master/README.md)
 and
-(https://github.com/victronenergy/dbus-mqtt/blob/master/README.md)[dbus-mqtt]
+[dbus-mqtt](https://github.com/victronenergy/dbus-mqtt/blob/master/README.md)
 under Venus OS.
 
 ## Operating principle
