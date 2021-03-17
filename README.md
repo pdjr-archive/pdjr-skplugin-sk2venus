@@ -5,23 +5,13 @@ under Venus OS available in Venus services.
 
 The plugin supports Venus service classes 'gps', 'tank' and 'temperature'.
 
-This project derives from an effort to create tank services in Venus from
-tank data in Signal K as a work-around for Venus' broken support for CAN
-connected multi-channel tank monitoring devices.
-Solving this original problem required some GUI enhancements to allow the
-display of multiple tanks and was achieved by borrowing from Kevin
-Windrem's
-[tank repeater](https://github.com/kwindrem/TankRepeater-for-VenusOs)
-project.
-The GUI updates are carried over here, so if you use this project to
-inject tank data into Venus, then you get the bonus of being able to
-display it [quite nicely](venus.png) on the Venus GUI.
-
 ## System requirements
 
 A host system running Signal K under Venus OS.
 
 ## Operating principle
+
+__pdjr-skplugin-sk2venus__ includes a small Python daemon which mediates
 
 __pdjr-skplugin-sk2venus__ processes a collection of *service definitions*
 into an equivalent collection of Venus services.
@@ -98,14 +88,8 @@ For example.
 | NrOfSatellites     |                        |                                 |
 | UtcTimestamp       |                        |                                 |
 
-GPS data in Signal K is handled very differently to in Venus.
-In fact, position data in Signal K need not necessarily derive from
+Note that position data in Signal K need not necessarily derive from
 GPS although it probably always does.
-Signal K also consolidates position data available from multiples
-sources and disaggregates the properties shown in the above table
-across multiple data paths.
-Consolidation strategies are configuration dependent and a number
-are implemented or planned.
 
 The following example uses consolidated position data to create a
 Venus service.
@@ -128,9 +112,9 @@ Whilst this example uses an explicit position source.
 
 The plugin tries to recover as many properties deriving from the
 position source identified by *path* as it can.
-Coverage varies dependent upon device capability and other factors, but
-a proper configuration will always set the Position/Latitude and
-Position/Longitude properties.
+Coverage varies dependent upon the capabilities and features of the
+position sensor, but a proper configuration will always set the
+Venus service's Position/Latitude and Position/Longitude properties.
 
 ## Installation
 
